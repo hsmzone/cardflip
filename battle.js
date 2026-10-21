@@ -4,6 +4,7 @@ const heroes=window.BATTLE_CHARACTERS,monsters=window.BATTLE_MONSTERS;
 const library=[...heroes,...monsters],byId=new Map(library.map(c=>[c.id,c]));
 let selections={ally:new Set(),enemy:new Set()},editing='ally',state=null,playing=false,busy=false,chosen=null;
 let generation=0,timer=null,waiters=new Map(),actions=0;
+let combatPanels=new Map();
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
 function photo(c){const img=el('img');img.src=(c.monster?'':'cha/')+encodeURIComponent(c.file);img.alt=c.name;img.draggable=false;return img;}
 function diceImage(type,face){const img=el('img','stat-die');img.src=`dice/${type===4?'T':''}${face}.png`;img.alt=`D${type} ${face}`;img.draggable=false;return img;}
@@ -71,6 +72,7 @@ function renderUnits(side){
     const value=el('span','fighter-stats');value.append(el('small','','⚔'),statVisual(u.attack),el('small','','◇'),statVisual(u.defense));
     const mana=el('span','unit-mana',`마력 ${u.mp} · 스킬 준비중`);
     n.append(initiative,cardArt(u),label,health,hp,value,mana);
+    if(combatPanels.has(u.uid))n.append(combatPanels.get(u.uid));
     n.addEventListener('click',()=>{
       if(side==='ally')selectActor(u.uid);
       else if(targetable)perform(u.uid);
@@ -92,13 +94,12 @@ function selectActor(id){
 }
 function startBattle(push=true){
   if(!selections.ally.size||!selections.enemy.size)return;
-  cancel();sound.unlock();sound.stop();chosen=null;actions=0;busy=false;playing=true;
+  cancel();combatPanels.clear();sound.unlock();sound.stop();chosen=null;actions=0;busy=false;playing=true;
   state=R.createBattle([...selections.ally].map(id=>byId.get(id)),[...selections.enemy].map(id=>byId.get(id)));
   $('#party-setup').hidden=true;$('#arena').hidden=false;document.body.classList.add('in-battle');
   if(push)history.pushState({battlePlay:true},'');
   $('#log-list').replaceChildren();$('#log-last').textContent='라운드 1 · 전원 민첩 판정 완료';
-  ['attack-value','defense-value','damage-value','hit-value'].forEach(id=>$('#'+id).textContent='—');
-  $('#dice-tray').replaceChildren();nextTurn();$('#back-to-party').focus({preventScroll:true});
+  nextTurn();$('#back-to-party').focus({preventScroll:true});
 }
 function nextTurn(){
   if(!playing||state.finished)return;
@@ -119,9 +120,15 @@ function addLog(result){
   const text=`R${result.round} ${result.attackerName}(민첩 ${result.attackerInitiative}) → ${result.defenderName}(민첩 ${result.defenderInitiative}) ${result.combo?'[연속공격] ':''}${lines}`;
   $('#log-list').prepend(el('li','',text));$('#log-last').textContent=text;
 }
+function unitCard(uid){return [...document.querySelectorAll('.duel-fighter')].find(n=>n.dataset.uid===uid);}
+function combatPanel(uid,label){
+  let box=combatPanels.get(uid);
+  if(!box){box=el('span','card-combat-result');box.setAttribute('role','status');box.append(el('small','combat-role'),el('span','card-result-dice'),el('strong','combat-remaining'),el('span','combat-impact'));combatPanels.set(uid,box);unitCard(uid).append(box);}
+  box.classList.toggle('attack-result',label.startsWith('공격'));box.classList.toggle('defense-result',!label.startsWith('공격'));
+  box.querySelector('.combat-role').textContent=label;return box;
+}
 async function showRolls(entries,token){
-  const tray=$('#dice-tray');tray.replaceChildren();
-  const cells=entries.map(([label,stat,roll])=>{const box=el('div','roll-group');box.append(el('small','',label));const value=el('span','roll-dice');box.append(value);tray.append(box);return {stat,roll,value};});
+  const cells=entries.map(([uid,label,stat,roll])=>{const box=combatPanel(uid,label);box.querySelector('.combat-impact').textContent='';box.querySelector('.combat-remaining').textContent='';return {stat,roll,value:box.querySelector('.card-result-dice')};});
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   for(let frame=1;frame<=(reduced?1:30);frame++){
     if(token!==generation)return false;
@@ -131,30 +138,42 @@ async function showRolls(entries,token){
   }
   if(token!==generation)return false;for(const {stat,roll,value}of cells)value.replaceChildren(statVisual(stat,roll));return true;
 }
+function showHP(uid,hp,maxHP){
+  const card=unitCard(uid);card.querySelector('.unit-health i').style.width=`${hp/maxHP*100}%`;
+  card.querySelector('.unit-hp').textContent=`${hp} / ${maxHP}`;
+  card.setAttribute('aria-label',`${card.closest('.ally-team')?'아군':'적군'} ${state.units.find(u=>u.uid===uid).name}, 체력 ${hp}/${maxHP}`);
+  card.classList.toggle('taking-damage',hp>0);card.classList.toggle('dead',hp<=0);
+}
 async function perform(targetId){
   if(!playing||busy||state.finished)return;
   clearTimeout(timer);busy=true;const token=generation;
+  combatPanels.clear();render();
   sound.unlock();sound.play('click');sound.play('flip',.04);
   const attacker=actor(),defender=state.units.find(u=>u.uid===targetId);
   const result=R.attack(state,targetId);actions++;
-  document.querySelectorAll('.duel-fighter').forEach(n=>n.disabled=true);$('#select-actor').disabled=true;
-  $('#arena').classList.add('rolling');$('#phase-label').textContent=result.combo?'연속공격!':'공격 판정';
-  $('#round-message').textContent=`${result.attackerName} → ${result.defenderName} · 민첩 ${result.attackerInitiative} : ${result.defenderInitiative}`;
-  if(!await wait(100)||token!==generation)return;
-  $('#arena').classList.remove('rolling');
-  let damage=0;
+  $('#phase-label').textContent=result.combo?'연속공격!':'공격 판정';
   for(let i=0;i<result.hits.length;i++){
-    const hit=result.hits[i];damage+=hit.damage;
-    const rolls=[[`${result.attackerName} 공격`,attacker.attack,hit.attack]];
-    if(i===0)rolls.push([`${result.defenderName} 방어`,defender.defense,result.defense]);
+    const hit=result.hits[i],attackBox=combatPanel(attacker.uid,`공격${result.combo?' · '+(i+1)+'타':''}`),defenseBox=combatPanel(defender.uid,'방어');
+    const rolls=[[attacker.uid,`공격${result.combo?' · '+(i+1)+'타':''}`,attacker.attack,hit.attack]];
+    if(i===0)rolls.push([defender.uid,'방어',defender.defense,result.defense]);
+    else {defenseBox.querySelector('.combat-role').textContent='남은 방어 · 재굴림 없음';defenseBox.querySelector('.card-result-dice').replaceChildren(el('b','dice-total',String(hit.shieldBefore)));defenseBox.querySelector('.combat-impact').textContent='';}
+    $('#round-message').textContent=`${result.attackerName} → ${result.defenderName} · ${i+1}타`;
     if(!await showRolls(rolls,token))return;
-    if(i>0)$('#dice-tray').append(el('span','shield-carry',`방어 재굴림 없음 · 남은 방어 ${hit.shieldBefore}`));
-    $('#attack-value').textContent=hit.attack.total;$('#defense-value').textContent=`${hit.shieldBefore} → ${hit.shieldAfter}`;
-    $('#damage-value').textContent=damage;$('#hit-value').textContent=`${i+1} / ${result.hits.length}`;
-    $('#phase-label').textContent=result.combo?`연속공격 · ${i+1}타`:'공격 완료';
-    $('#round-message').textContent=`${result.attackerName} → ${result.defenderName} · 공격 ${hit.attack.total}, 방어 ${hit.shieldBefore}, 체력 피해 ${hit.damage}${i>0?' (방어 재굴림 없음)':''}`;
+    if(!await wait(650)||token!==generation)return;
+    attackBox.querySelector('.combat-remaining').textContent=`${hit.attack.total} → ${hit.damage}`;
+    defenseBox.querySelector('.combat-remaining').textContent=`${hit.shieldBefore} → ${hit.shieldAfter}`;
+    defenseBox.querySelector('.combat-impact').textContent=`${hit.blocked} 상쇄`;
+    defenseBox.classList.add('blocking');
+    if(!await wait(650)||token!==generation)return;
+    defenseBox.classList.remove('blocking');
+    attackBox.querySelector('.combat-remaining').textContent=`${hit.damage} → 0`;
+    const impact=defenseBox.querySelector('.combat-impact');
+    impact.replaceChildren(el('small','',hit.damage?'체력':'방어'),el('b','',hit.damage?'−'+hit.damage:'성공'));
+    showHP(defender.uid,hit.hpAfter,defender.maxHP);
+    $('#round-message').textContent=`${result.attackerName} → ${result.defenderName} · 방어 ${hit.blocked} 상쇄, 체력 피해 ${hit.damage}`;
     sound.play(hit.damage>0?'match':'miss');
-    if(!await wait(450)||token!==generation)return;
+    if(!await wait(850)||token!==generation)return;
+    unitCard(defender.uid).classList.remove('taking-damage');
   }
   addLog(result);busy=false;render();
   if(state.finished){showResult();return}nextTurn();
