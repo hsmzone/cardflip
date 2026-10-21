@@ -1,0 +1,50 @@
+[
+  {
+    "name": "걷는버섯",
+    "file": "battle-monster-걷는버섯.png",
+    "attack": {
+      "diceCount": 2,
+      "diceType": 4,
+      "mode": 0,
+      "fixedValue": 1
+    },
+    "defense": {
+      "diceCount": 1,
+      "diceType": 4,
+      "mode": 0,
+      "fixedValue": 1
+    }
+  },
+  {
+    "name": "스켈레톤",
+    "file": "battle-monster-스켈레톤.png",
+    "attack": {
+      "diceCount": 2,
+      "diceType": 6,
+      "mode": 0,
+      "fixedValue": 1
+    },
+    "defense": {
+      "diceCount": 4,
+      "diceType": 4,
+      "mode": 0,
+      "fixedValue": 1
+    }
+  },
+  {
+    "name": "움직이는 갑옷",
+    "file": "battle-monster-움직이는갑옷.png",
+    "attack": {
+      "diceCount": 5,
+      "diceType": 6,
+      "mode": 0,
+      "fixedValue": 1
+    },
+    "defense": {
+      "diceCount": 5,
+      "diceType": 4,
+      "mode": 0,
+      "fixedValue": 1
+    }
+  }
+]

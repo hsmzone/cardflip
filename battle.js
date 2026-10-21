@@ -1,157 +1,162 @@
 'use strict';
-const $ = selector => document.querySelector(selector);
-const R = BattleRules, roster = window.BATTLE_CHARACTERS, monsters = window.BATTLE_MONSTERS;
-const encounters = [
-  { title: '버섯의 숲', label: '걷는버섯 파티', enemies: [monsters[0], monsters[0]], hp: 18 },
-  { title: '고요한 납골당', label: '스켈레톤', enemies: [monsters[1]], hp: 20 },
-  { title: '갑옷의 방', label: '움직이는 갑옷', enemies: [monsters[2]], hp: 24 }
-];
-const maxHP = 80;
-let selected = new Set(), party = [], stage = 0, round = 1, allyHP = maxHP, enemyHP = 18;
-let playing = false, busy = false, campaignTurns = 0, lastOutcome = null, autoTimer = null;
-let generation = 0, pendingWaits = new Map();
-function wait(ms) {
-  return new Promise(resolve => { const timer = setTimeout(() => { pendingWaits.delete(timer); resolve(true); }, ms); pendingWaits.set(timer, resolve); });
-}
-function cancelTimers() {
-  generation++; clearTimeout(autoTimer);
-  pendingWaits.forEach((resolve, timer) => { clearTimeout(timer); resolve(false); }); pendingWaits.clear();
-}
-function element(tag, className, text) {
-  const el = document.createElement(tag);
-  if (className) el.className = className;
-  if (text !== undefined) el.textContent = text;
-  return el;
-}
-function image(character, enemy = false) {
-  const img = element('img'); img.src = `${enemy ? '' : 'cha/'}${encodeURIComponent(character.file)}`;
-  img.alt = character.name; img.draggable = false; return img;
-}
-function statLabel(character) { return `⚔ ${R.formatStat(character.attack)}　◇ ${R.formatStat(character.defense)}`; }
-function updateSelection() {
-  $('#selected-count').textContent = `${selected.size} / 4`; $('#begin-battle').disabled = selected.size !== 4;
-  for (const button of document.querySelectorAll('.roster-card')) {
-    const checked = selected.has(button.dataset.id);
-    button.classList.toggle('selected', checked); button.setAttribute('aria-pressed', String(checked));
-    button.querySelector('.selection-tick').textContent = checked ? '✓' : '+';
+const $=s=>document.querySelector(s),R=BattleRules;
+const heroes=window.BATTLE_CHARACTERS,monsters=window.BATTLE_MONSTERS;
+const library=[...heroes,...monsters],byId=new Map(library.map(c=>[c.id,c]));
+let selections={ally:new Set(),enemy:new Set()},editing='ally',state=null,playing=false,busy=false,chosen=null;
+let generation=0,timer=null,waiters=new Map(),actions=0;
+function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
+function photo(c){const img=el('img');img.src=(c.monster?'':'cha/')+encodeURIComponent(c.file);img.alt=c.name;img.draggable=false;return img;}
+function stats(c){return [['민첩',R.formatStat(c.agility)],['공격',R.formatStat(c.attack)],['방어',R.formatStat(c.defense)],['체력',c.hp],['마력',c.mp]];}
+function cancel(){generation++;clearTimeout(timer);waiters.forEach((resolve,id)=>{clearTimeout(id);resolve(false)});waiters.clear();}
+function wait(ms){return new Promise(resolve=>{const id=setTimeout(()=>{waiters.delete(id);resolve(true)},ms);waiters.set(id,resolve)});}
+function updateSelection(){
+  for(const side of ['ally','enemy']){
+    $('#'+side+'-count').textContent=`${selections[side].size} / 4`;
+    $('#'+side+'-selected').textContent=[...selections[side]].map(id=>byId.get(id).name).join(' · ')||'캐릭터를 선택하세요';
+    $('#edit-'+side).classList.toggle('active',editing===side);$('#edit-'+side).setAttribute('aria-pressed',String(editing===side));
   }
-  $('#setup-feedback').textContent = selected.size === 4 ? '파티가 준비됐습니다. 던전에 입장하세요.' : `모험가 ${4 - selected.size}명을 더 선택해주세요.`;
+  document.querySelectorAll('.roster-card').forEach(n=>{const selected=selections[editing].has(n.dataset.id);n.classList.toggle('selected',selected);n.setAttribute('aria-pressed',String(selected));n.querySelector('.selection-tick').textContent=selected?'✓':'+'});
+  $('#begin-battle').disabled=selections.ally.size<1||selections.enemy.size<1;
+  $('#setup-feedback').textContent=`${editing==='ally'?'아군':'적군'} 편성 중 · 아군 ${selections.ally.size}명 vs 적군 ${selections.enemy.size}명`;
 }
-function renderRoster() {
-  const filter = $('#party-filter').value, visible = roster.filter(c => filter === 'all' || c.party === filter);
-  $('#roster-count').textContent = `모험가 ${visible.length}명`;
-  $('#roster').replaceChildren(...visible.map(character => {
-    const card = element('button', 'roster-card'); card.type = 'button'; card.dataset.id = character.id;
-    card.setAttribute('aria-label', `${character.name}, 공격 ${R.formatStat(character.attack)}, 방어 ${R.formatStat(character.defense)}`);
-    card.append(element('span', 'selection-tick'), image(character), element('strong', 'roster-name', character.name), element('span', 'roster-stats', statLabel(character)));
-    card.addEventListener('click', () => {
-      if (selected.has(character.id)) selected.delete(character.id);
-      else if (selected.size < 4) selected.add(character.id);
-      else { $('#setup-feedback').textContent = '이미 네 명을 골랐어요. 교체할 모험가를 먼저 해제해주세요.'; return; }
-      sound.unlock(); sound.play('click'); updateSelection();
-    }); return card;
-  })); updateSelection();
+function renderRoster(){
+  const filter=$('#party-filter').value;
+  const candidates=(editing==='ally'?heroes:library).filter(c=>filter==='all'||c.job===filter);
+  $('#roster-count').textContent=`선택 가능 ${candidates.length}명`;
+  $('#roster').replaceChildren(...candidates.map(c=>{
+    const n=el('button','roster-card job-card');n.type='button';n.dataset.id=c.id;n.setAttribute('aria-label',`${c.name}, ${c.job} ${c.subtype}`);
+    const info=el('span','roster-info');info.append(el('strong','',c.name),el('small','job-label',`${c.job} · ${c.subtype}`));
+    const values=el('span','unit-stats');for(const [label,value]of stats(c)){const s=el('span');s.append(el('small','',label),el('b','',String(value)));values.append(s)}info.append(values);
+    n.append(el('span','selection-tick'),photo(c),info);
+    n.addEventListener('click',()=>{
+      const set=selections[editing];if(set.has(c.id))set.delete(c.id);else if(set.size<4)set.add(c.id);else{$('#setup-feedback').textContent='팀은 최대 4명입니다. 교체할 캐릭터를 먼저 해제해주세요.';return}
+      sound.unlock();sound.play('click');updateSelection();
+    });return n;
+  }));updateSelection();
 }
-function defaultParty() {
-  selected = new Set(['라이오스', '마르실', '칠책', '센시'].map(name => roster.find(c => c.name === name)?.id).filter(Boolean));
-  for (const character of roster) { if (selected.size === 4) break; selected.add(character.id); } updateSelection();
-}
-function renderLineup(team, target, enemy) {
-  target.replaceChildren(...team.map((character, index) => {
-    const unit = element('article', 'fighter'); unit.dataset.unit = index;
-    unit.append(element('span', 'roll-float'), image(character, enemy), element('strong', 'fighter-name', character.name), element('span', 'fighter-stats', statLabel(character))); return unit;
+function defaultTeams(){selections.ally=new Set(['더스','파란','한별','소낙'].filter(id=>byId.has(id)));selections.enemy=new Set(monsters.slice(0,2).map(c=>c.id));updateSelection()}
+function edit(side){editing=side;$('#party-filter').value='all';renderRoster()}
+function actor(){return state&&R.actor(state)}
+function renderOrder(){
+  $('#turn-order').replaceChildren(...state.order.map(id=>{
+    const unit=state.units.find(u=>u.uid===id),n=el('span','order-chip '+unit.side);
+    n.classList.toggle('current',actor()?.uid===id);n.classList.toggle('done',unit.acted||unit.hp<=0);
+    n.textContent=`${unit.initiative.total} · ${unit.name}${unit.hp<=0?' †':''}`;return n;
   }));
 }
-function updateHealth() {
-  $('#ally-hp-label').textContent = `${allyHP} / ${maxHP}`; $('#enemy-hp-label').textContent = `${enemyHP} / ${encounters[stage].hp}`;
-  $('#ally-hp-bar').style.width = `${allyHP / maxHP * 100}%`; $('#enemy-hp-bar').style.width = `${enemyHP / encounters[stage].hp * 100}%`;
+function renderUnits(side){
+  const current=actor(),targetable=!busy&&current?.side==='ally'&&chosen===current.uid;
+  const units=state.units.filter(u=>u.side===side);
+  $('#'+side+'-lineup').classList.toggle('single',units.length===1);
+  $('#'+side+'-hp-label').textContent=`생존 ${units.filter(u=>u.hp>0).length} / ${units.length}`;
+  $('#'+side+'-lineup').replaceChildren(...units.map(u=>{
+    const n=el('button','fighter duel-fighter');n.type='button';n.dataset.uid=u.uid;
+    n.classList.toggle('dead',u.hp<=0);n.classList.toggle('acting',current?.uid===u.uid);n.classList.toggle('chosen',chosen===u.uid);n.classList.toggle('targetable',side==='enemy'&&targetable&&u.hp>0);
+    n.disabled=u.hp<=0||busy;n.setAttribute('aria-label',`${side==='ally'?'아군':'적군'} ${u.name}, 체력 ${u.hp}/${u.maxHP}`);
+    n.setAttribute('aria-pressed',String(chosen===u.uid));
+    const initiative=el('span','unit-initiative',u.hp>0?`민첩 ${u.initiative.total}`:'사망');
+    const name=el('strong','fighter-name',u.name),label=el('span','fighter-job',`${u.job} · ${u.subtype}`);
+    const health=el('span','unit-health'),fill=el('i');fill.style.width=`${u.hp/u.maxHP*100}%`;health.append(fill);
+    const hp=el('span','unit-hp',`${u.hp} / ${u.maxHP}`);
+    const value=el('span','fighter-stats',`⚔ ${R.formatStat(u.attack)}　◇ ${R.formatStat(u.defense)}`);
+    const mana=el('span','unit-mana',`마력 ${u.mp} · 스킬 준비중`);
+    n.append(initiative,photo(u),name,label,health,hp,value,mana);
+    n.addEventListener('click',()=>{
+      if(side==='ally')selectActor(u.uid);
+      else if(targetable)perform(u.uid);
+      else $('#round-message').textContent='먼저 이번 차례의 아군 캐릭터를 선택하세요.';
+    });return n;
+  }));
 }
-function setTacticsDisabled(disabled) { document.querySelectorAll('.tactic-card').forEach(button => button.disabled = disabled); }
-function resetScores() { ['ally-attack', 'ally-defense', 'enemy-attack', 'enemy-defense'].forEach(id => $('#' + id).textContent = '—'); }
-function startEncounter() {
+function render(){
+  renderOrder();renderUnits('ally');renderUnits('enemy');$('#round-label').textContent=`ROUND ${String(state.round).padStart(2,'0')}`;
+  const unit=actor();$('#select-actor').disabled=busy||!unit||unit.side!=='ally';
+  $('#select-actor').textContent=!unit?'대결 종료':chosen===unit.uid?'공격할 적을 선택하세요':unit.side==='ally'?`${unit.name} 선택`:'적이 행동 중입니다';
+  $('#turn-prompt').textContent=unit?`${unit.name}의 차례 · 민첩 ${unit.initiative.total} (낮을수록 선행)`:'대결 종료';
+}
+function selectActor(id){
+  const current=actor();if(!playing||busy||current?.side!=='ally')return;
+  if(id!==current.uid){$('#round-message').textContent=`이번에는 민첩 순서상 ${current.name}의 차례입니다.`;return}
+  chosen=id;sound.unlock();sound.play('click');$('#phase-label').textContent=`${current.name} → 대상 선택`;
+  $('#round-message').textContent='공격할 적 캐릭터를 누르세요. 민첩이 3 이상 낮으면 연속공격!';render();
+}
+function startBattle(push=true){
+  if(!selections.ally.size||!selections.enemy.size)return;
+  cancel();sound.unlock();sound.stop();chosen=null;actions=0;busy=false;playing=true;
+  state=R.createBattle([...selections.ally].map(id=>byId.get(id)),[...selections.enemy].map(id=>byId.get(id)));
+  $('#party-setup').hidden=true;$('#arena').hidden=false;document.body.classList.add('in-battle');
+  if(push)history.pushState({battlePlay:true},'');
+  $('#log-list').replaceChildren();$('#log-last').textContent='라운드 1 · 전원 민첩 판정 완료';
+  ['attack-value','defense-value','damage-value','hit-value'].forEach(id=>$('#'+id).textContent='—');
+  nextTurn();$('#back-to-party').focus({preventScroll:true});
+}
+function nextTurn(){
+  if(!playing||state.finished)return;
+  chosen=null;render();const unit=actor();
+  $('#phase-label').textContent=unit.side==='ally'?'아군 차례':'적군 차례';
+  $('#round-message').textContent=unit.side==='ally'?`${unit.name} 캐릭터를 선택한 뒤 공격 대상을 지정하세요.`:`${unit.name} 캐릭터가 공격 대상을 고릅니다.`;
+  schedule();
+}
+function schedule(){
+  clearTimeout(timer);const unit=actor();if(!playing||busy||state.finished||!unit)return;
+  if(unit.side==='enemy'||$('#auto-battle').checked){timer=setTimeout(()=>{
+    const targets=R.living(state,unit.side==='ally'?'enemy':'ally');
+    if(targets.length)perform(targets[Math.floor(Math.random()*targets.length)].uid);
+  },850)}
+}
+function addLog(result){
+  const lines=result.hits.map((h,i)=>`${i+1}타 공격 ${h.attack.total} − 방어 ${h.shieldBefore} → 피해 ${h.damage}, 남은 방어 ${h.shieldAfter}`).join(' / ');
+  const text=`R${result.round} ${result.attackerName}(민첩 ${result.attackerInitiative}) → ${result.defenderName}(민첩 ${result.defenderInitiative}) ${result.combo?'[연속공격] ':''}${lines}`;
+  $('#log-list').prepend(el('li','',text));$('#log-last').textContent=text;
+}
+async function perform(targetId){
+  if(!playing||busy||state.finished)return;
+  clearTimeout(timer);busy=true;const token=generation;
+  sound.unlock();sound.play('click');sound.play('flip',.04);
+  const result=R.attack(state,targetId);actions++;
+  document.querySelectorAll('.duel-fighter').forEach(n=>n.disabled=true);$('#select-actor').disabled=true;
+  $('#arena').classList.add('rolling');$('#phase-label').textContent=result.combo?'연속공격!':'공격 판정';
+  $('#round-message').textContent=`${result.attackerName} → ${result.defenderName} · 민첩 ${result.attackerInitiative} : ${result.defenderInitiative}`;
+  if(!await wait(500)||token!==generation)return;
   $('#arena').classList.remove('rolling');
-  const encounter = encounters[stage]; round = 1; busy = false; lastOutcome = null; enemyHP = encounter.hp;
-  $('#round-label').textContent = 'ROUND 01'; $('#encounter-title').textContent = encounter.title; $('#enemy-name').textContent = encounter.label;
-  document.querySelectorAll('[data-stage]').forEach((node, index) => { node.classList.toggle('current', index === stage); node.classList.toggle('passed', index < stage); });
-  renderLineup(party, $('#ally-lineup'), false); renderLineup(encounter.enemies, $('#enemy-lineup'), true);
-  updateHealth(); resetScores(); setTacticsDisabled(false);
-  $('#phase-label').textContent = '전술을 선택하세요'; $('#round-message').textContent = '전술 카드를 고르면 주사위가 굴러갑니다.'; queueAuto();
+  let damage=0;
+  for(let i=0;i<result.hits.length;i++){
+    const hit=result.hits[i];damage+=hit.damage;
+    $('#attack-value').textContent=hit.attack.total;$('#defense-value').textContent=`${hit.shieldBefore} → ${hit.shieldAfter}`;
+    $('#damage-value').textContent=damage;$('#hit-value').textContent=`${i+1} / ${result.hits.length}`;
+    $('#phase-label').textContent=result.combo?`연속공격 · ${i+1}타`:'공격 완료';
+    $('#round-message').textContent=`${result.attackerName} → ${result.defenderName} · 공격 ${hit.attack.total}, 방어 ${hit.shieldBefore}, 체력 피해 ${hit.damage}${i>0?' (방어 재굴림 없음)':''}`;
+    sound.play(hit.damage>0?'match':'miss');
+    if(!await wait(450)||token!==generation)return;
+  }
+  addLog(result);busy=false;render();
+  if(state.finished){showResult();return}nextTurn();
 }
-function startCampaign() {
-  if (selected.size !== 4) return;
-  cancelTimers(); sound.unlock(); sound.play('flip'); party = roster.filter(c => selected.has(c.id));
-  allyHP = maxHP; stage = 0; campaignTurns = 0; playing = true;
-  $('#log-list').replaceChildren(); $('#log-last').textContent = '모험을 시작합니다.';
-  $('#party-setup').hidden = true; $('#arena').hidden = false; document.body.classList.add('in-battle');
-  history.pushState({ battlePlay: true }, ''); startEncounter(); $('#back-to-party').focus({ preventScroll: true });
+function showResult(){
+  const win=state.finished==='win';$('#result-kicker').textContent=win?'VICTORY':state.finished==='draw'?'DRAW':'DEFEAT';
+  $('#battle-result-title').textContent=win?'모든 적을 섬멸했어요!':state.finished==='draw'?'무승부입니다.':'아군이 전멸했습니다.';
+  $('#battle-result-description').textContent=`${state.round}라운드 · ${actions}번의 공격 · 아군 생존 ${R.living(state,'ally').length}명`;
+  $('#battle-result').showModal();sound.play(win?'clear':'miss');
 }
-function returnToSetup() {
-  cancelTimers(); sound.stop(); playing = false; busy = false;
-  $('#arena').classList.remove('rolling');
-  if ($('#battle-result').open) $('#battle-result').close();
-  $('#arena').hidden = true; $('#party-setup').hidden = false; $('#auto-battle').checked = false;
-  document.body.classList.remove('in-battle'); $('#begin-battle').focus({ preventScroll: true });
+function returnToSetup(){
+  cancel();sound.stop();playing=false;busy=false;$('#arena').classList.remove('rolling');
+  if($('#battle-result').open)$('#battle-result').close();$('#arena').hidden=true;$('#party-setup').hidden=false;
+  $('#auto-battle').checked=false;document.body.classList.remove('in-battle');$('#begin-battle').focus({preventScroll:true});
 }
-function leaveBattle() { if (!playing) return; returnToSetup(); if (history.state?.battlePlay) history.back(); }
-function logRound(result) {
-  const text = `${stage + 1}전 ${round}턴 · ${result.tactic.title} · 아군 ⚔${result.ally.attack} / ◇${result.ally.defense}, 적 ⚔${result.enemy.attack} / ◇${result.enemy.defense} → 준 피해 ${result.dealt}, 받은 피해 ${result.taken}`;
-  $('#log-list').prepend(element('li', '', text)); $('#log-last').textContent = text;
-}
-function showDice(teamRoll, selector) {
-  const fighters = document.querySelectorAll(selector + ' .fighter');
-  teamRoll.members.forEach((member, index) => {
-    const unit = fighters[index]; unit.querySelector('.roll-float').textContent = `⚔ ${member.attack.total}　◇ ${member.defense.total}`; unit.classList.add('has-roll');
-    unit.querySelector('.fighter-stats').textContent = `⚔ ${member.attack.dice.length ? member.attack.dice.join(' + ') : member.attack.total + ' 고정'} / ◇ ${member.defense.dice.length ? member.defense.dice.join(' + ') : member.defense.total + ' 고정'}`;
-  });
-}
-async function takeTurn(tacticId) {
-  if (!playing || busy || lastOutcome) return;
-  clearTimeout(autoTimer); busy = true; setTacticsDisabled(true); const token = generation;
-  sound.unlock(); sound.play('click'); sound.play('flip', 0.05);
-  document.querySelectorAll('.fighter').forEach(unit => unit.classList.remove('has-roll'));
-  $('#arena').classList.add('rolling'); resetScores(); $('#phase-label').textContent = '주사위를 굴립니다'; $('#round-message').textContent = '모험가와 적의 공격·방어 판정 중…';
-  const result = R.resolveRound(party, encounters[stage].enemies, tacticId);
-  if (!await wait(550) || token !== generation) return;
-  $('#arena').classList.remove('rolling'); showDice(result.ally, '#ally-lineup'); showDice(result.enemy, '#enemy-lineup');
-  $('#ally-attack').textContent = result.ally.attack; $('#ally-defense').textContent = result.ally.defense; $('#enemy-attack').textContent = result.enemy.attack; $('#enemy-defense').textContent = result.enemy.defense;
-  allyHP = Math.max(0, allyHP - result.taken); enemyHP = Math.max(0, enemyHP - result.dealt); campaignTurns++; updateHealth(); logRound(result);
-  $('#phase-label').textContent = result.tactic.title + ' · 판정 완료'; $('#round-message').textContent = `적에게 ${result.dealt} 피해 · 아군이 ${result.taken} 피해를 받았습니다.`;
-  sound.play(result.dealt >= result.taken ? 'match' : 'miss'); lastOutcome = R.outcome(allyHP, enemyHP);
-  if (!await wait(700) || token !== generation) return;
-  if (lastOutcome) { showBattleResult(); return; }
-  round++; $('#round-label').textContent = `ROUND ${String(round).padStart(2, '0')}`; busy = false; setTacticsDisabled(false); queueAuto();
-}
-function showBattleResult() {
-  const win = lastOutcome === 'win', cleared = win && stage === encounters.length - 1;
-  $('#result-kicker').textContent = cleared ? 'DUNGEON CLEARED' : win ? 'VICTORY' : lastOutcome === 'draw' ? 'DRAW' : 'DEFEAT';
-  $('#battle-result-title').textContent = cleared ? '던전을 정복했어요!' : win ? '승리! 다음 방으로.' : lastOutcome === 'draw' ? '마지막 일격, 무승부.' : '모험은 여기까지…';
-  $('#battle-result-description').textContent = win && !cleared ? `남은 체력 ${allyHP}. 잠시 쉬어 체력을 12 회복한 뒤 다음 전투로 갑니다.` : `총 ${campaignTurns}턴을 함께했습니다. ${cleared ? '네 모험가의 멋진 승리입니다.' : '다른 파티와 전술로 다시 도전해보세요.'}`;
-  $('#continue-battle').textContent = win && !cleared ? '다음 전투 →' : '같은 파티로 다시 도전'; $('#battle-result').showModal(); sound.play(win ? 'clear' : 'miss');
-}
-function queueAuto() {
-  clearTimeout(autoTimer); if (!playing || busy || lastOutcome || !$('#auto-battle').checked) return;
-  autoTimer = setTimeout(() => takeTurn('assault'), 900);
-}
-$('#continue-battle').addEventListener('click', () => {
-  $('#battle-result').close();
-  if (lastOutcome === 'win' && stage < encounters.length - 1) { stage++; allyHP = Math.min(maxHP, allyHP + 12); startEncounter(); }
-  else { cancelTimers(); stage = 0; allyHP = maxHP; campaignTurns = 0; $('#log-list').replaceChildren(); $('#log-last').textContent = '다시 모험을 시작합니다.'; startEncounter(); }
+function leave(){if(!playing)return;returnToSetup();if(history.state?.battlePlay)history.back()}
+$('#edit-ally').addEventListener('click',()=>edit('ally'));$('#edit-enemy').addEventListener('click',()=>edit('enemy'));
+$('#default-party').addEventListener('click',defaultTeams);
+$('#random-party').addEventListener('click',()=>{
+  function choose(pool){const p=[...pool];for(let i=p.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]]}return new Set(p.slice(0,1+Math.floor(Math.random()*4)).map(c=>c.id))}
+  selections.ally=choose(heroes);selections.enemy=choose(library);updateSelection();
 });
-$('#result-party').addEventListener('click', leaveBattle);
-$('#battle-result').addEventListener('cancel', event => { event.preventDefault(); leaveBattle(); });
-$('#begin-battle').addEventListener('click', startCampaign); $('#back-to-party').addEventListener('click', leaveBattle); $('#default-party').addEventListener('click', defaultParty);
-$('#random-party').addEventListener('click', () => {
-  const shuffled = [...roster]; for (let i = shuffled.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; }
-  selected = new Set(shuffled.slice(0, 4).map(c => c.id)); updateSelection();
-});
-$('#party-filter').addEventListener('change', renderRoster); $('#auto-battle').addEventListener('change', queueAuto);
-$('#battle-sound').checked = sound.enabled; $('#battle-sound').addEventListener('change', event => sound.setEnabled(event.target.checked));
-window.addEventListener('popstate', () => { if (playing) returnToSetup(); });
-window.addEventListener('keydown', event => { if (event.key === 'Escape' && playing) { event.preventDefault(); leaveBattle(); } });
-for (const name of new Set(roster.map(c => c.party))) { const option = element('option', '', name); option.value = name; $('#party-filter').append(option); }
-for (const tactic of R.TACTICS) {
-  const button = element('button', 'tactic-card tactic-' + tactic.id); button.type = 'button'; button.setAttribute('aria-label', `${tactic.title}, 공격 +${tactic.attack}, 방어 +${tactic.defense}`);
-  button.append(element('span', 'tactic-icon', tactic.icon), element('strong', '', tactic.title), element('small', '', tactic.subtitle), element('span', 'tactic-bonus', `⚔ +${tactic.attack}　◇ +${tactic.defense}`));
-  button.addEventListener('click', () => takeTurn(tactic.id)); $('#tactics').append(button);
-}
-renderRoster(); defaultParty();
+$('#party-filter').addEventListener('change',renderRoster);
+$('#begin-battle').addEventListener('click',()=>startBattle());$('#back-to-party').addEventListener('click',leave);
+$('#select-actor').addEventListener('click',()=>selectActor(actor()?.uid));
+$('#auto-battle').addEventListener('change',schedule);
+$('#continue-battle').addEventListener('click',()=>{$('#battle-result').close();startBattle(false)});
+$('#result-party').addEventListener('click',leave);$('#battle-result').addEventListener('cancel',e=>{e.preventDefault();leave()});
+$('#battle-sound').checked=sound.enabled;$('#battle-sound').addEventListener('change',e=>sound.setEnabled(e.target.checked));
+window.addEventListener('popstate',()=>{if(playing)returnToSetup()});window.addEventListener('keydown',e=>{if(e.key==='Escape'&&playing){e.preventDefault();leave()}});
+for(const job of new Set(library.map(c=>c.job))){const option=el('option','',job);option.value=job;$('#party-filter').append(option)}
+renderRoster();defaultTeams();

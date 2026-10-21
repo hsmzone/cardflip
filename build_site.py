@@ -3,9 +3,11 @@ import json
 import shutil
 from pathlib import Path
 from server import ROOT, characters
+from sync_battle_data import generate
 
 
 def build(output=None):
+    generate()
     target = Path(output) if output else ROOT / '_site'
     target.mkdir(parents=True, exist_ok=True)
     for name in ['index.html', 'memory.html', 'battle.html', 'battle.css', 'battle.js',

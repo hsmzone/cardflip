@@ -1,0 +1,37 @@
+'use strict';
+const assert=require('node:assert/strict');
+const R=require('./battle-engine.js');
+const fixed=n=>({mode:1,fixedValue:n});
+const dice=(count,sides,bonus=0)=>({mode:0,diceCount:count,diceType:sides,bonus});
+const unit=(name,attack,defense,initiative=1,hp=30)=>({name,uid:name,attack:fixed(attack),defense:fixed(defense),agility:dice(1,4),initiative:{total:initiative},hp});
+let a=unit('a',8,0,3),b=unit('b',0,4,6);
+let r=R.resolveDuel(a,b);
+assert.equal(r.combo,true);assert.deepEqual(r.hits.map(h=>h.damage),[4,8]);assert.deepEqual(r.hits.map(h=>h.shieldAfter),[0,0]);assert.equal(b.hp,18);
+a=unit('a',4,0,1);b=unit('b',0,6,4);r=R.resolveDuel(a,b);
+assert.deepEqual(r.hits.map(h=>h.damage),[0,2]);assert.deepEqual(r.hits.map(h=>h.shieldBefore),[6,2]);assert.equal(b.hp,28);
+r=R.resolveDuel(unit('a',4,0,1),unit('b',0,8,3));assert.equal(r.hits.length,1);assert.equal(r.hits[0].damage,0);
+r=R.resolveDuel(unit('a',4,0,4),unit('b',0,0,1));assert.equal(r.combo,false);
+r=R.resolveDuel(unit('a',8,0,1),unit('b',0,0,4,3));assert.equal(r.hits.length,1);
+let calls=0;const def=unit('def',0,0,6,100);def.defense=dice(1,6);
+R.resolveDuel(unit('a',2,0,1),def,()=>{calls++;return .5});assert.equal(calls,1,'defense rolled once for both hits');
+const rollingAttacker=unit('a',0,0,1),unarmored=unit('b',0,0,6,100);rollingAttacker.attack=dice(1,6);let rolls=[0,.999];
+assert.deepEqual(R.resolveDuel(rollingAttacker,unarmored,()=>rolls.shift()).hits.map(h=>h.attack.total),[1,6]);
+assert.deepEqual(R.rollStat(dice(2,6,3),()=>0).dice,[1,1]);assert.equal(R.rollStat(dice(2,6,3),()=>0).total,5);assert.equal(R.rollStat(dice(1,4,-1),()=>0).total,0);
+let battle=R.createBattle([unit('a',100,0),unit('b',1,0)],[unit('c',1,0)],()=>0);
+assert.equal(battle.units.length,3);assert.throws(()=>R.attack(battle,'ally-1'));
+R.attack(battle,'enemy-0',()=>0);assert.equal(battle.finished,'win');assert.equal(battle.units.find(u=>u.uid==='enemy-0').hp,0);assert.equal(R.actor(battle),null);
+battle=R.createBattle([unit('a',0,100)],[unit('c',0,100)],()=>0);
+R.attack(battle,'enemy-0',()=>0);R.attack(battle,'ally-0',()=>0);assert.equal(battle.round,2);assert(battle.units.every(u=>!u.acted));
+battle=R.createBattle([unit('a',0,0)],[unit('b',100,0)],()=>0);R.attack(battle,'enemy-0',()=>0);R.attack(battle,'ally-0',()=>0);assert.equal(battle.finished,'lose');
+assert.throws(()=>R.createBattle([],[]));assert.throws(()=>R.createBattle(Array(5).fill(unit('x',1,1)),[unit('e',1,1)]));
+for(let allies=1;allies<=4;allies++)for(let enemies=1;enemies<=4;enemies++){
+  const s=R.createBattle(Array.from({length:allies},(_,i)=>unit('a'+i,3,2)),Array.from({length:enemies},(_,i)=>unit('e'+i,3,2)));
+  assert.equal(s.units.length,allies+enemies);assert.equal(s.order.length,allies+enemies);
+  assert(s.order.every((id,i)=>i===0||s.units.find(u=>u.uid===s.order[i-1]).initiative.total<=s.units.find(u=>u.uid===id).initiative.total));
+}
+const slow=unit('slow',1,1),fast=unit('fast',100,0),slower=unit('slower',1,1);
+fast.agility=fixed(1);slow.agility=fixed(2);slower.agility=fixed(3);
+battle=R.createBattle([fast],[slow,slower],()=>0);R.attack(battle,'enemy-0',()=>0);assert.equal(R.actor(battle).uid,'enemy-1');
+const tieA=unit('tieA',1,1),tieB=unit('tieB',1,1);tieA.agility=fixed(2);tieB.agility=fixed(2);let ties=[.9,.1];
+battle=R.createBattle([tieA],[tieB],()=>ties.shift());assert.equal(R.actor(battle).side,'enemy');
+console.log('PASS: requested combo examples, shield carry, no second defense roll, zero damage, early kill, valid target, individual death, victory/defeat, round renewal, team limits.');
