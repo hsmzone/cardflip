@@ -1212,27 +1212,163 @@ window.BATTLE_CHARACTERS = [
 ];
 window.BATTLE_MONSTERS = [
   {
-    "name": "걷는버섯",
-    "file": "battle-monster-걷는버섯.png",
-    "attack": {
-      "diceCount": 2,
-      "diceType": 4,
-      "mode": 0,
-      "fixedValue": 1
-    },
-    "defense": {
-      "diceCount": 1,
-      "diceType": 4,
-      "mode": 0,
-      "fixedValue": 1
-    },
-    "id": "monster-0",
+    "id": "monster:mon/가고일.png",
+    "name": "가고일",
+    "file": "mon/가고일.png",
     "job": "몬스터",
-    "subtype": "던전",
+    "subtype": "일반",
     "monster": true,
+    "tier": "normal",
+    "solo": false,
     "agility": {
       "mode": 0,
       "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 38,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/거대개구리.png",
+    "name": "거대개구리",
+    "file": "mon/거대개구리.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 26,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/거대거미.png",
+    "name": "거대거미",
+    "file": "mon/거대거미.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 22,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/거대걷는버섯.png",
+    "name": "거대걷는버섯",
+    "file": "mon/거대걷는버섯.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 1,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 42,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/거대박쥐.png",
+    "name": "거대박쥐",
+    "file": "mon/거대박쥐.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
       "diceType": 4,
       "bonus": 0,
       "fixedValue": 0
@@ -1241,28 +1377,98 @@ window.BATTLE_MONSTERS = [
     "mp": 0
   },
   {
-    "name": "스켈레톤",
-    "file": "battle-monster-스켈레톤.png",
+    "id": "monster:mon/거대전갈.png",
+    "name": "거대전갈",
+    "file": "mon/거대전갈.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
     "attack": {
+      "mode": 0,
       "diceCount": 2,
       "diceType": 6,
-      "mode": 0,
-      "fixedValue": 1
+      "bonus": 2,
+      "fixedValue": 0
     },
     "defense": {
-      "diceCount": 4,
-      "diceType": 4,
       "mode": 0,
-      "fixedValue": 1
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
     },
-    "id": "monster-1",
+    "hp": 30,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/걷는버섯.png",
+    "name": "걷는버섯",
+    "file": "mon/걷는버섯.png",
     "job": "몬스터",
-    "subtype": "던전",
+    "subtype": "일반",
     "monster": true,
+    "tier": "normal",
+    "solo": false,
     "agility": {
       "mode": 0,
       "diceCount": 2,
-      "diceType": 6,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 1,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 16,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/걷는버섯_2.png",
+    "name": "걷는버섯_2",
+    "file": "mon/걷는버섯_2.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
       "bonus": 0,
       "fixedValue": 0
     },
@@ -1270,32 +1476,1521 @@ window.BATTLE_MONSTERS = [
     "mp": 0
   },
   {
-    "name": "움직이는 갑옷",
-    "file": "battle-monster-움직이는갑옷.png",
-    "attack": {
-      "diceCount": 5,
-      "diceType": 6,
+    "id": "monster:mon/걷는버섯_3.png",
+    "name": "걷는버섯_3",
+    "file": "mon/걷는버섯_3.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
       "mode": 0,
-      "fixedValue": 1
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 1,
+      "fixedValue": 0
     },
     "defense": {
-      "diceCount": 5,
-      "diceType": 4,
       "mode": 0,
-      "fixedValue": 1
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
     },
-    "id": "monster-2",
+    "hp": 24,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/골렘.png",
+    "name": "골렘",
+    "file": "mon/골렘.png",
     "job": "몬스터",
-    "subtype": "던전",
+    "subtype": "일반",
     "monster": true,
+    "tier": "normal",
+    "solo": false,
     "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "hp": 65,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/그리핀.png",
+    "name": "그리핀",
+    "file": "mon/그리핀.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
       "mode": 0,
       "diceCount": 1,
       "diceType": 6,
       "bonus": 2,
       "fixedValue": 0
     },
+    "hp": 46,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/늑대인간.png",
+    "name": "늑대인간",
+    "file": "mon/늑대인간.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 36,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/도플갱어.png",
+    "name": "도플갱어",
+    "file": "mon/도플갱어.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 32,
+    "mp": 6
+  },
+  {
+    "id": "monster:mon/둘라한.png",
+    "name": "둘라한",
+    "file": "mon/둘라한.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 52,
+    "mp": 6
+  },
+  {
+    "id": "monster:mon/드라이어드.png",
+    "name": "드라이어드",
+    "file": "mon/드라이어드.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 34,
+    "mp": 10
+  },
+  {
+    "id": "monster:mon/맨드레이크.png",
+    "name": "맨드레이크",
+    "file": "mon/맨드레이크.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 18,
+    "mp": 3
+  },
+  {
+    "id": "monster:mon/미궁토끼.png",
+    "name": "미궁토끼",
+    "file": "mon/미궁토끼.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 1,
+      "fixedValue": 0,
+      "diceCount": 0,
+      "diceType": 4,
+      "bonus": 0
+    },
+    "hp": 16,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/미믹.png",
+    "name": "미믹",
+    "file": "mon/미믹.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 34,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/바로그.png",
+    "name": "바로그",
+    "file": "mon/바로그.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 48,
+    "mp": 8
+  },
+  {
+    "id": "monster:mon/바실리스크.png",
+    "name": "바실리스크",
+    "file": "mon/바실리스크.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 38,
+    "mp": 3
+  },
+  {
+    "id": "monster:mon/바이콘.png",
+    "name": "바이콘",
+    "file": "mon/바이콘.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 1,
+      "fixedValue": 0
+    },
+    "hp": 40,
+    "mp": 2
+  },
+  {
+    "id": "monster:mon/보석벌레.png",
+    "name": "보석벌레",
+    "file": "mon/보석벌레.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 12,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/살아있는그림.png",
+    "name": "살아있는그림",
+    "file": "mon/살아있는그림.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 22,
+    "mp": 8
+  },
+  {
+    "id": "monster:mon/서큐버스.png",
+    "name": "서큐버스",
+    "file": "mon/서큐버스.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 28,
+    "mp": 16
+  },
+  {
+    "id": "monster:mon/스켈레톤.png",
+    "name": "스켈레톤",
+    "file": "mon/스켈레톤.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 1,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 1,
+      "fixedValue": 0
+    },
+    "hp": 22,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/슬라임.png",
+    "name": "슬라임",
+    "file": "mon/슬라임.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 14,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/식인식물.png",
+    "name": "식인식물",
+    "file": "mon/식인식물.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 32,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/어인.png",
+    "name": "어인",
+    "file": "mon/어인.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 1,
+      "fixedValue": 0
+    },
+    "hp": 26,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/오크(리드).png",
+    "name": "오크(리드)",
+    "file": "mon/오크(리드).png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 42,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/와이번.png",
+    "name": "와이번",
+    "file": "mon/와이번.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 46,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/운디네.png",
+    "name": "운디네",
+    "file": "mon/운디네.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 30,
+    "mp": 18
+  },
+  {
+    "id": "monster:mon/움직이는갑옷.png",
+    "name": "움직이는갑옷",
+    "file": "mon/움직이는갑옷.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "hp": 44,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/유니콘.png",
+    "name": "유니콘",
+    "file": "mon/유니콘.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 38,
+    "mp": 12
+  },
+  {
+    "id": "monster:mon/유령.png",
+    "name": "유령",
+    "file": "mon/유령.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 24,
+    "mp": 10
+  },
+  {
+    "id": "monster:mon/켈피.png",
+    "name": "켈피",
+    "file": "mon/켈피.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 32,
+    "mp": 4
+  },
+  {
+    "id": "monster:mon/코카트리스.png",
+    "name": "코카트리스",
+    "file": "mon/코카트리스.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 28,
+    "mp": 4
+  },
+  {
+    "id": "monster:mon/텐터클스.png",
+    "name": "텐터클스",
+    "file": "mon/텐터클스.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 34,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/피닉스.png",
+    "name": "피닉스",
+    "file": "mon/피닉스.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 44,
+    "mp": 20
+  },
+  {
+    "id": "monster:mon/하피.png",
+    "name": "하피",
+    "file": "mon/하피.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
     "hp": 24,
     "mp": 0
+  },
+  {
+    "id": "monster:mon/해골바로그.png",
+    "name": "해골바로그",
+    "file": "mon/해골바로그.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 44,
+    "mp": 6
+  },
+  {
+    "id": "monster:mon/히포그리프.png",
+    "name": "히포그리프",
+    "file": "mon/히포그리프.png",
+    "job": "몬스터",
+    "subtype": "일반",
+    "monster": true,
+    "tier": "normal",
+    "solo": false,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "hp": 40,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/MidBoss/걷는버섯군단.png",
+    "name": "걷는버섯군단",
+    "file": "mon/MidBoss/걷는버섯군단.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 4,
+      "diceType": 6,
+      "bonus": 6,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 200,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/MidBoss/그린드래곤.png",
+    "name": "그린드래곤",
+    "file": "mon/MidBoss/그린드래곤.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 4,
+      "diceType": 6,
+      "bonus": 8,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "hp": 220,
+    "mp": 16
+  },
+  {
+    "id": "monster:mon/MidBoss/나이트메어.png",
+    "name": "나이트메어",
+    "file": "mon/MidBoss/나이트메어.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 4,
+      "diceType": 6,
+      "bonus": 7,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 180,
+    "mp": 24
+  },
+  {
+    "id": "monster:mon/MidBoss/동양용.png",
+    "name": "동양용",
+    "file": "mon/MidBoss/동양용.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 4,
+      "diceType": 6,
+      "bonus": 9,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "hp": 240,
+    "mp": 32
+  },
+  {
+    "id": "monster:mon/MidBoss/레드드래곤.png",
+    "name": "레드드래곤",
+    "file": "mon/MidBoss/레드드래곤.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 5,
+      "diceType": 6,
+      "bonus": 8,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 4,
+      "fixedValue": 0
+    },
+    "hp": 260,
+    "mp": 20
+  },
+  {
+    "id": "monster:mon/MidBoss/시서펜트.png",
+    "name": "시서펜트",
+    "file": "mon/MidBoss/시서펜트.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 4,
+      "diceType": 6,
+      "bonus": 8,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "hp": 240,
+    "mp": 16
+  },
+  {
+    "id": "monster:mon/MidBoss/웜.png",
+    "name": "웜",
+    "file": "mon/MidBoss/웜.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 5,
+      "diceType": 6,
+      "bonus": 6,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 4,
+      "fixedValue": 0
+    },
+    "hp": 250,
+    "mp": 0
+  },
+  {
+    "id": "monster:mon/MidBoss/자이언트크라켄.png",
+    "name": "자이언트크라켄",
+    "file": "mon/MidBoss/자이언트크라켄.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 5,
+      "diceType": 6,
+      "bonus": 7,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 2,
+      "fixedValue": 0
+    },
+    "hp": 260,
+    "mp": 12
+  },
+  {
+    "id": "monster:mon/MidBoss/키메라파린.png",
+    "name": "키메라파린",
+    "file": "mon/MidBoss/키메라파린.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 4,
+      "diceType": 6,
+      "bonus": 10,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 3,
+      "fixedValue": 0
+    },
+    "hp": 230,
+    "mp": 24
+  },
+  {
+    "id": "monster:mon/MidBoss/화이트드래곤.png",
+    "name": "화이트드래곤",
+    "file": "mon/MidBoss/화이트드래곤.png",
+    "job": "몬스터",
+    "subtype": "중간 보스 · 단독",
+    "monster": true,
+    "tier": "midboss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 6,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 4,
+      "diceType": 6,
+      "bonus": 8,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 4,
+      "fixedValue": 0
+    },
+    "hp": 240,
+    "mp": 24
+  },
+  {
+    "id": "monster:mon/Boss/광란의마술사시슬.png",
+    "name": "광란의마술사시슬",
+    "file": "mon/Boss/광란의마술사시슬.png",
+    "job": "몬스터",
+    "subtype": "보스 · 단독",
+    "monster": true,
+    "tier": "boss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 6,
+      "diceType": 6,
+      "bonus": 18,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 2,
+      "diceType": 6,
+      "bonus": 5,
+      "fixedValue": 0
+    },
+    "hp": 600,
+    "mp": 100
+  },
+  {
+    "id": "monster:mon/Boss/날개사자.png",
+    "name": "날개사자",
+    "file": "mon/Boss/날개사자.png",
+    "job": "몬스터",
+    "subtype": "보스 · 단독",
+    "monster": true,
+    "tier": "boss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 6,
+      "diceType": 6,
+      "bonus": 24,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 4,
+      "fixedValue": 0
+    },
+    "hp": 800,
+    "mp": 150
+  },
+  {
+    "id": "monster:mon/Boss/최강의마물.png",
+    "name": "최강의마물",
+    "file": "mon/Boss/최강의마물.png",
+    "job": "몬스터",
+    "subtype": "보스 · 단독",
+    "monster": true,
+    "tier": "boss",
+    "solo": true,
+    "agility": {
+      "mode": 0,
+      "diceCount": 1,
+      "diceType": 4,
+      "bonus": 0,
+      "fixedValue": 0
+    },
+    "attack": {
+      "mode": 0,
+      "diceCount": 6,
+      "diceType": 6,
+      "bonus": 30,
+      "fixedValue": 0
+    },
+    "defense": {
+      "mode": 0,
+      "diceCount": 3,
+      "diceType": 6,
+      "bonus": 6,
+      "fixedValue": 0
+    },
+    "hp": 1000,
+    "mp": 100
   }
 ];

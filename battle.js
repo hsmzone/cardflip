@@ -5,8 +5,10 @@ const library=[...heroes,...monsters],byId=new Map(library.map(c=>[c.id,c]));
 let selections={ally:new Set(),enemy:new Set()},editing='ally',state=null,playing=false,busy=false,chosen=null;
 let generation=0,timer=null,waiters=new Map(),actions=0;
 let combatPanels=new Map();
+let campaign=null,stageIndex=0;
+function isCampaign(){return $('#battle-mode').value==='campaign';}
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
-function photo(c){const img=el('img');img.src=(c.monster?'':'cha/')+encodeURIComponent(c.file);img.alt=c.name;img.draggable=false;return img;}
+function photo(c){const img=el('img');img.src=(c.monster?'':'cha/')+c.file.split('/').map(encodeURIComponent).join('/');img.alt=c.name;img.draggable=false;return img;}
 function diceImage(type,face){const img=el('img','stat-die');img.src=`dice/${type===4?'T':''}${face}.png`;img.alt=`D${type} ${face}`;img.draggable=false;return img;}
 function statVisual(stat,roll=null){
   const n=el('span','dice-stat');n.setAttribute('aria-label',roll?`${R.formatStat(stat)} 결과 ${roll.total}`:R.formatStat(stat));n.title=R.formatStat(stat);
@@ -17,35 +19,38 @@ function statVisual(stat,roll=null){
   if(roll)n.append(el('b','dice-total','= '+roll.total));return n;
 }
 function stats(c){return [['민첩',c.agility],['공격',c.attack],['방어',c.defense],['체력',c.hp],['마력',c.mp]];}
-function cardArt(c){const art=el('span','battle-card-art'),mask=el('span','battle-card-mask');mask.append(photo(c));const ribbon=el('img','battle-card-ribbon');ribbon.src='name.png';ribbon.alt='';art.append(mask,ribbon,el('strong','battle-card-name',c.name));return art;}
+function cardArt(c){const art=el('span','battle-card-art'),mask=el('span','battle-card-mask');mask.append(photo(c));const ribbon=el('img','battle-card-ribbon');ribbon.src='name.png';ribbon.alt='';art.append(mask,ribbon,el('strong','battle-card-name'+(c.name.length>5?' long-name':''),c.name));return art;}
 function cancel(){generation++;clearTimeout(timer);waiters.forEach((resolve,id)=>{clearTimeout(id);resolve(false)});waiters.clear();}
 function wait(ms){return new Promise(resolve=>{const id=setTimeout(()=>{waiters.delete(id);resolve(true)},ms);waiters.set(id,resolve)});}
 function updateSelection(){
   for(const side of ['ally','enemy']){
-    $('#'+side+'-count').textContent=`${selections[side].size} / 4`;
+    $('#'+side+'-count').textContent=`${selections[side].size} / ${[...selections[side]].some(id=>byId.get(id).solo)?1:4}`;
     $('#'+side+'-selected').textContent=[...selections[side]].map(id=>byId.get(id).name).join(' · ')||'캐릭터를 선택하세요';
     $('#edit-'+side).classList.toggle('active',editing===side);$('#edit-'+side).setAttribute('aria-pressed',String(editing===side));
   }
   document.querySelectorAll('.roster-card').forEach(n=>{const selected=selections[editing].has(n.dataset.id);n.classList.toggle('selected',selected);n.setAttribute('aria-pressed',String(selected));n.querySelector('.selection-tick').textContent=selected?'✓':'+'});
-  $('#begin-battle').disabled=selections.ally.size<1||selections.enemy.size<1;
-  $('#setup-feedback').textContent=`${editing==='ally'?'아군':'적군'} 편성 중 · 아군 ${selections.ally.size}명 vs 적군 ${selections.enemy.size}명`;
+  $('#begin-battle').disabled=selections.ally.size<1||(!isCampaign()&&selections.enemy.size<1);
+  $('#edit-enemy').disabled=isCampaign();
+  $('#campaign-note').hidden=!isCampaign();
+  if(isCampaign()){$('#enemy-count').textContent='12 STAGES';$('#enemy-selected').textContent='8 중간 보스 · 12 최종 보스';}
+  $('#setup-feedback').textContent=isCampaign()?`아군 ${selections.ally.size}명으로 12스테이지 도전 · 보스는 단독 출전`:`${editing==='ally'?'아군':'적군'} 편성 중 · 아군 ${selections.ally.size}명 vs 적군 ${selections.enemy.size}명${[...selections.enemy].some(id=>byId.get(id).solo)?' · 나 홀로 전투':''}`;
 }
 function renderRoster(){
   const filter=$('#party-filter').value;
-  const candidates=(editing==='ally'?heroes:library).filter(c=>filter==='all'||c.job===filter);
+  const candidates=(editing==='ally'?heroes:library).filter(c=>filter==='all'||c.job===filter||'tier:'+c.tier===filter);
   $('#roster-count').textContent=`선택 가능 ${candidates.length}명`;
   $('#roster').replaceChildren(...candidates.map(c=>{
-    const n=el('button','roster-card job-card');n.type='button';n.dataset.id=c.id;n.setAttribute('aria-label',`${c.name}, ${c.job} ${c.subtype}`);
+    const n=el('button','roster-card job-card');n.type='button';n.dataset.id=c.id;if(c.tier)n.dataset.tier=c.tier;n.setAttribute('aria-label',`${c.name}, ${c.job} ${c.subtype}`);
     const info=el('span','roster-info');info.append(el('strong','',c.name),el('small','job-label',`${c.job} · ${c.subtype}`));
     const values=el('span','unit-stats');for(const [label,value]of stats(c)){const s=el('span');s.append(el('small','',label),typeof value==='object'?statVisual(value):el('b','',String(value)));values.append(s)}info.append(values);
     n.append(el('span','selection-tick'),cardArt(c),info);
     n.addEventListener('click',()=>{
-      const set=selections[editing];if(set.has(c.id))set.delete(c.id);else if(set.size<4)set.add(c.id);else{$('#setup-feedback').textContent='팀은 최대 4명입니다. 교체할 캐릭터를 먼저 해제해주세요.';return}
+      const set=selections[editing];if(set.has(c.id))set.delete(c.id);else if(c.solo){set.clear();set.add(c.id);}else if([...set].some(id=>byId.get(id).solo)){set.clear();set.add(c.id);}else if(set.size<4)set.add(c.id);else{$('#setup-feedback').textContent='팀은 최대 4명입니다. 교체할 캐릭터를 먼저 해제해주세요.';return}
       sound.unlock();sound.play('click');updateSelection();
     });return n;
   }));updateSelection();
 }
-function defaultTeams(){selections.ally=new Set(['더스','파란','한별','소낙'].filter(id=>byId.has(id)));selections.enemy=new Set(monsters.slice(0,2).map(c=>c.id));updateSelection()}
+function defaultTeams(){selections.ally=new Set(['더스','파란','한별','소낙'].filter(id=>byId.has(id)));selections.enemy=new Set(monsters.filter(c=>['걷는버섯','스켈레톤'].includes(c.name)&&!c.solo).map(c=>c.id));updateSelection()}
 function edit(side){editing=side;$('#party-filter').value='all';renderRoster()}
 function actor(){return state&&R.actor(state)}
 function renderOrder(){
@@ -81,7 +86,7 @@ function renderUnits(side){
   }));
 }
 function render(){
-  renderOrder();renderUnits('ally');renderUnits('enemy');$('#round-label').textContent=`ROUND ${String(state.round).padStart(2,'0')}`;
+  renderOrder();renderUnits('ally');renderUnits('enemy');$('#round-label').textContent=`${campaign?'STAGE '+(stageIndex+1)+' / 12 · ':''}ROUND ${String(state.round).padStart(2,'0')}`;
   const unit=actor();$('#select-actor').disabled=busy||!unit||unit.side!=='ally';
   $('#select-actor').textContent=!unit?'대결 종료':chosen===unit.uid?'공격할 적을 선택하세요':unit.side==='ally'?`${unit.name} 선택`:'적이 행동 중입니다';
   $('#turn-prompt').textContent=unit?`${unit.name}의 차례 · 민첩 ${unit.initiative.total} (낮을수록 선행)`:'대결 종료';
@@ -93,9 +98,11 @@ function selectActor(id){
   $('#round-message').textContent='공격할 적 캐릭터를 누르세요. 민첩이 3 이상 낮으면 연속공격!';render();
 }
 function startBattle(push=true){
-  if(!selections.ally.size||!selections.enemy.size)return;
+  if(!selections.ally.size||(!isCampaign()&&!selections.enemy.size))return;
+  if(isCampaign()&&!campaign){campaign=R.createCampaign(monsters);stageIndex=0;}
   cancel();combatPanels.clear();sound.unlock();sound.stop();chosen=null;actions=0;busy=false;playing=true;
-  state=R.createBattle([...selections.ally].map(id=>byId.get(id)),[...selections.enemy].map(id=>byId.get(id)));
+  state=R.createBattle([...selections.ally].map(id=>byId.get(id)),campaign?campaign[stageIndex].enemies:[...selections.enemy].map(id=>byId.get(id)));
+  $('#encounter-title').textContent=campaign?`${stageIndex+1}스테이지 · ${campaign[stageIndex].kind}`:'자유 대결';
   $('#party-setup').hidden=true;$('#arena').hidden=false;document.body.classList.add('in-battle');
   if(push)history.pushState({battlePlay:true},'');
   $('#log-list').replaceChildren();$('#log-last').textContent='라운드 1 · 전원 민첩 판정 완료';
@@ -182,10 +189,15 @@ function showResult(){
   const win=state.finished==='win';$('#result-kicker').textContent=win?'VICTORY':state.finished==='draw'?'DRAW':'DEFEAT';
   $('#battle-result-title').textContent=win?'모든 적을 섬멸했어요!':state.finished==='draw'?'무승부입니다.':'아군이 전멸했습니다.';
   $('#battle-result-description').textContent=`${state.round}라운드 · ${actions}번의 공격 · 아군 생존 ${R.living(state,'ally').length}명`;
+  if(campaign){
+    $('#battle-result-title').textContent=win?(stageIndex===11?'12스테이지 완전 정복!':`${stageIndex+1}스테이지 돌파!`):`${stageIndex+1}스테이지 도전 실패`;
+    $('#battle-result-description').textContent+=win&&stageIndex<11?' · 다음 스테이지에서 체력 완전 회복':'';
+  }
+  $('#continue-battle').textContent=campaign&&win&&stageIndex<11?'다음 스테이지 →':campaign&&win?'처음부터 다시 도전':campaign?'현재 스테이지 재도전':'같은 팀으로 재대결';
   $('#battle-result').showModal();sound.play(win?'clear':'miss');
 }
 function returnToSetup(){
-  cancel();sound.stop();playing=false;busy=false;$('#arena').classList.remove('rolling');
+  cancel();campaign=null;stageIndex=0;sound.stop();playing=false;busy=false;$('#arena').classList.remove('rolling');
   if($('#battle-result').open)$('#battle-result').close();$('#arena').hidden=true;$('#party-setup').hidden=false;
   $('#auto-battle').checked=false;document.body.classList.remove('in-battle');$('#begin-battle').focus({preventScroll:true});
 }
@@ -193,16 +205,18 @@ function leave(){if(!playing)return;returnToSetup();if(history.state?.battlePlay
 $('#edit-ally').addEventListener('click',()=>edit('ally'));$('#edit-enemy').addEventListener('click',()=>edit('enemy'));
 $('#default-party').addEventListener('click',defaultTeams);
 $('#random-party').addEventListener('click',()=>{
-  function choose(pool){const p=[...pool];for(let i=p.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]]}return new Set(p.slice(0,1+Math.floor(Math.random()*4)).map(c=>c.id))}
+  function choose(pool){const p=[...pool];for(let i=p.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]]}if(p[0]?.solo)return new Set([p[0].id]);return new Set(p.filter(c=>!c.solo).slice(0,1+Math.floor(Math.random()*4)).map(c=>c.id))}
   selections.ally=choose(heroes);selections.enemy=choose(library);updateSelection();
 });
 $('#party-filter').addEventListener('change',renderRoster);
+$('#battle-mode').addEventListener('change',()=>{campaign=null;stageIndex=0;$('#party-filter').value='all';if(isCampaign())editing='ally';renderRoster()});
 $('#begin-battle').addEventListener('click',()=>startBattle());$('#back-to-party').addEventListener('click',leave);
 $('#select-actor').addEventListener('click',()=>selectActor(actor()?.uid));
 $('#auto-battle').addEventListener('change',schedule);
-$('#continue-battle').addEventListener('click',()=>{$('#battle-result').close();startBattle(false)});
+$('#continue-battle').addEventListener('click',()=>{$('#battle-result').close();if(campaign&&state.finished==='win'){if(stageIndex<11)stageIndex++;else{campaign=null;stageIndex=0;}}startBattle(false)});
 $('#result-party').addEventListener('click',leave);$('#battle-result').addEventListener('cancel',e=>{e.preventDefault();leave()});
 $('#battle-sound').checked=sound.enabled;$('#battle-sound').addEventListener('change',e=>sound.setEnabled(e.target.checked));
 window.addEventListener('popstate',()=>{if(playing)returnToSetup()});window.addEventListener('keydown',e=>{if(e.key==='Escape'&&playing){e.preventDefault();leave()}});
 for(const job of new Set(library.map(c=>c.job))){const option=el('option','',job);option.value=job;$('#party-filter').append(option)}
+for(const [value,label]of [['normal','일반 몬스터'],['midboss','중간 보스 · 단독'],['boss','보스 · 단독']]){const o=el('option','',label);o.value='tier:'+value;$('#party-filter').append(o)}
 renderRoster();defaultTeams();

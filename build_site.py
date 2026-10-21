@@ -16,6 +16,7 @@ def build(output=None):
         shutil.copy2(ROOT / name, target / name)
     for image in ROOT.glob('battle-monster-*.png'):
         shutil.copy2(image, target / image.name)
+    shutil.copytree(ROOT / 'mon', target / 'mon', dirs_exist_ok=True)
     shutil.copytree(ROOT / 'dice', target / 'dice', dirs_exist_ok=True)
     entries = characters()
     (target / 'cha').mkdir(exist_ok=True)

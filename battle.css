@@ -35,3 +35,7 @@
 @media(prefers-reduced-motion:reduce){.taking-damage .battle-card-art{animation:none}.unit-health i{transition:none}}
 
 .combat-impact{display:flex;align-items:center;gap:3px;white-space:nowrap}.combat-impact>small{font-size:10px;font-weight:500}.combat-impact>b{font-size:20px}.combat-remaining{white-space:nowrap}
+.unit-stats .dice-stat{flex:1;min-width:0;flex-wrap:wrap;white-space:normal}.battle-card-name.long-name{font-size:7px!important}
+
+.campaign-config{display:flex;align-items:center;gap:20px;padding:16px;background:#10251fd9;border:1px solid #cda67f40;border-radius:8px}.campaign-config label{font-size:12px;white-space:nowrap}.campaign-config select{margin-left:8px}.campaign-config p{font-size:11px;color:#cdbd9e;line-height:1.8}.job-card[data-tier="boss"]{border-color:#f19b68}.job-card[data-tier="midboss"]{border-color:#ba9fea}.battle-card-name{font-size:clamp(8px,1vw,16px)}@media(max-width:650px){.campaign-config{flex-direction:column;align-items:stretch;gap:8px}.campaign-config p{font-size:10px}.battle-card-name{font-size:8px}}
+.unit-stats>span>small{flex-shrink:0;white-space:nowrap}.unit-stats>span{gap:4px}

@@ -3,6 +3,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
+from monster_stats import monsters_from_folder
 
 ROOT = Path(__file__).resolve().parent
 JOBS = [
@@ -45,14 +46,20 @@ def generate():
                 agility=dice(base[0],agility_bonus),attack=dice(base[1],attack_bonus),
                 defense=dice(base[2],defense_bonus),hp=base[3]+health_bonus,mp=max(0,base[4]+mana_bonus),
                 base=dict(agility=dice(base[0]),attack=dice(base[1]),defense=dice(base[2]),hp=base[3],mp=base[4])))
-    monsters=json.loads((ROOT/'monster-data.json').read_text(encoding='utf-8'))
-    for index, monster in enumerate(monsters):
-        monster.update(id='monster-'+str(index),job='몬스터',subtype='던전',monster=True,
-                       agility=dice(['2D4','2D6','1D6+2'][index]),hp=[18,20,24][index],mp=0)
+    monsters=monsters_from_folder(ROOT, dice)
+    (ROOT/'monster-data.json').write_text(json.dumps(monsters,ensure_ascii=False,indent=2),encoding='utf-8')
+    def expression(stat):
+        if stat['mode']==1: return str(stat['fixedValue'])
+        bonus=stat.get('bonus',0)
+        return f"{stat['diceCount']}D{stat['diceType']}"+(f'+{bonus}' if bonus>0 else str(bonus) if bonus<0 else '')
+    lines=['# 몬스터 기본 스탯 목록', '', '스테이지에서는 단계별 강화가 추가 적용됩니다. 보스와 중간 보스는 단독으로만 전투합니다.', '',
+           '| 이름 | 등급 | 민첩 | 공격 | 방어 | 체력 | 마력 |', '|---|---|---|---|---|---:|---:|']
+    lines += ['| '+' | '.join([c['name'],c['subtype'],expression(c['agility']),expression(c['attack']),expression(c['defense']),str(c['hp']),str(c['mp'])])+' |' for c in monsters]
+    (ROOT/'monster-catalog.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
     payload='window.BATTLE_CHARACTERS = '+json.dumps(records,ensure_ascii=False,indent=2)+';\n'
     payload+='window.BATTLE_MONSTERS = '+json.dumps(monsters,ensure_ascii=False,indent=2)+';\n'
     (ROOT/'battle-data.js').write_text(payload,encoding='utf-8')
-    print(f'Synced {len(records)} character images and {len(monsters)} preserved monsters.')
+    print(f'Synced {len(records)} character images and {len(monsters)} folder monsters.')
     unknown=set(images)-{c['name'] for c in records}
     if unknown: print('Images without a job: '+', '.join(sorted(unknown)))
 
