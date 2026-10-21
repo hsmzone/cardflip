@@ -6,7 +6,17 @@ let selections={ally:new Set(),enemy:new Set()},editing='ally',state=null,playin
 let generation=0,timer=null,waiters=new Map(),actions=0;
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
 function photo(c){const img=el('img');img.src=(c.monster?'':'cha/')+encodeURIComponent(c.file);img.alt=c.name;img.draggable=false;return img;}
-function stats(c){return [['민첩',R.formatStat(c.agility)],['공격',R.formatStat(c.attack)],['방어',R.formatStat(c.defense)],['체력',c.hp],['마력',c.mp]];}
+function diceImage(type,face){const img=el('img','stat-die');img.src=`dice/${type===4?'T':''}${face}.png`;img.alt=`D${type} ${face}`;img.draggable=false;return img;}
+function statVisual(stat,roll=null){
+  const n=el('span','dice-stat');n.setAttribute('aria-label',roll?`${R.formatStat(stat)} 결과 ${roll.total}`:R.formatStat(stat));n.title=R.formatStat(stat);
+  if(stat.mode===1){n.append(el('b','fixed-stat',String(roll?roll.total:stat.fixedValue)));return n;}
+  const faces=roll?roll.dice:Array(stat.diceCount).fill(stat.diceType);
+  for(const face of faces)n.append(diceImage(stat.diceType,face));
+  const bonus=stat.bonus||0;if(bonus)n.append(el('b','dice-bonus',bonus>0?'+'+bonus:String(bonus)));
+  if(roll)n.append(el('b','dice-total','= '+roll.total));return n;
+}
+function stats(c){return [['민첩',c.agility],['공격',c.attack],['방어',c.defense],['체력',c.hp],['마력',c.mp]];}
+function cardArt(c){const art=el('span','battle-card-art'),mask=el('span','battle-card-mask');mask.append(photo(c));const ribbon=el('img','battle-card-ribbon');ribbon.src='name.png';ribbon.alt='';art.append(mask,ribbon,el('strong','battle-card-name',c.name));return art;}
 function cancel(){generation++;clearTimeout(timer);waiters.forEach((resolve,id)=>{clearTimeout(id);resolve(false)});waiters.clear();}
 function wait(ms){return new Promise(resolve=>{const id=setTimeout(()=>{waiters.delete(id);resolve(true)},ms);waiters.set(id,resolve)});}
 function updateSelection(){
@@ -26,8 +36,8 @@ function renderRoster(){
   $('#roster').replaceChildren(...candidates.map(c=>{
     const n=el('button','roster-card job-card');n.type='button';n.dataset.id=c.id;n.setAttribute('aria-label',`${c.name}, ${c.job} ${c.subtype}`);
     const info=el('span','roster-info');info.append(el('strong','',c.name),el('small','job-label',`${c.job} · ${c.subtype}`));
-    const values=el('span','unit-stats');for(const [label,value]of stats(c)){const s=el('span');s.append(el('small','',label),el('b','',String(value)));values.append(s)}info.append(values);
-    n.append(el('span','selection-tick'),photo(c),info);
+    const values=el('span','unit-stats');for(const [label,value]of stats(c)){const s=el('span');s.append(el('small','',label),typeof value==='object'?statVisual(value):el('b','',String(value)));values.append(s)}info.append(values);
+    n.append(el('span','selection-tick'),cardArt(c),info);
     n.addEventListener('click',()=>{
       const set=selections[editing];if(set.has(c.id))set.delete(c.id);else if(set.size<4)set.add(c.id);else{$('#setup-feedback').textContent='팀은 최대 4명입니다. 교체할 캐릭터를 먼저 해제해주세요.';return}
       sound.unlock();sound.play('click');updateSelection();
@@ -58,9 +68,9 @@ function renderUnits(side){
     const name=el('strong','fighter-name',u.name),label=el('span','fighter-job',`${u.job} · ${u.subtype}`);
     const health=el('span','unit-health'),fill=el('i');fill.style.width=`${u.hp/u.maxHP*100}%`;health.append(fill);
     const hp=el('span','unit-hp',`${u.hp} / ${u.maxHP}`);
-    const value=el('span','fighter-stats',`⚔ ${R.formatStat(u.attack)}　◇ ${R.formatStat(u.defense)}`);
+    const value=el('span','fighter-stats');value.append(el('small','','⚔'),statVisual(u.attack),el('small','','◇'),statVisual(u.defense));
     const mana=el('span','unit-mana',`마력 ${u.mp} · 스킬 준비중`);
-    n.append(initiative,photo(u),name,label,health,hp,value,mana);
+    n.append(initiative,cardArt(u),label,health,hp,value,mana);
     n.addEventListener('click',()=>{
       if(side==='ally')selectActor(u.uid);
       else if(targetable)perform(u.uid);
@@ -88,7 +98,7 @@ function startBattle(push=true){
   if(push)history.pushState({battlePlay:true},'');
   $('#log-list').replaceChildren();$('#log-last').textContent='라운드 1 · 전원 민첩 판정 완료';
   ['attack-value','defense-value','damage-value','hit-value'].forEach(id=>$('#'+id).textContent='—');
-  nextTurn();$('#back-to-party').focus({preventScroll:true});
+  $('#dice-tray').replaceChildren();nextTurn();$('#back-to-party').focus({preventScroll:true});
 }
 function nextTurn(){
   if(!playing||state.finished)return;
@@ -109,19 +119,36 @@ function addLog(result){
   const text=`R${result.round} ${result.attackerName}(민첩 ${result.attackerInitiative}) → ${result.defenderName}(민첩 ${result.defenderInitiative}) ${result.combo?'[연속공격] ':''}${lines}`;
   $('#log-list').prepend(el('li','',text));$('#log-last').textContent=text;
 }
+async function showRolls(entries,token){
+  const tray=$('#dice-tray');tray.replaceChildren();
+  const cells=entries.map(([label,stat,roll])=>{const box=el('div','roll-group');box.append(el('small','',label));const value=el('span','roll-dice');box.append(value);tray.append(box);return {stat,roll,value};});
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for(let frame=1;frame<=(reduced?1:30);frame++){
+    if(token!==generation)return false;
+    for(const {stat,value}of cells){value.replaceChildren();if(stat.mode===1){value.append(statVisual(stat));continue;}
+      for(let i=0;i<stat.diceCount;i++){const img=el('img','rolling-die');img.alt='주사위 굴리는 중';img.src=stat.diceType===4?`dice/TDiceMv/TD_01 (${frame}).png`:`dice/DiceMv/${String(frame).padStart(4,'0')}.png`;value.append(img);}}
+    if(!await wait(reduced?1:25))return false;
+  }
+  if(token!==generation)return false;for(const {stat,roll,value}of cells)value.replaceChildren(statVisual(stat,roll));return true;
+}
 async function perform(targetId){
   if(!playing||busy||state.finished)return;
   clearTimeout(timer);busy=true;const token=generation;
   sound.unlock();sound.play('click');sound.play('flip',.04);
+  const attacker=actor(),defender=state.units.find(u=>u.uid===targetId);
   const result=R.attack(state,targetId);actions++;
   document.querySelectorAll('.duel-fighter').forEach(n=>n.disabled=true);$('#select-actor').disabled=true;
   $('#arena').classList.add('rolling');$('#phase-label').textContent=result.combo?'연속공격!':'공격 판정';
   $('#round-message').textContent=`${result.attackerName} → ${result.defenderName} · 민첩 ${result.attackerInitiative} : ${result.defenderInitiative}`;
-  if(!await wait(500)||token!==generation)return;
+  if(!await wait(100)||token!==generation)return;
   $('#arena').classList.remove('rolling');
   let damage=0;
   for(let i=0;i<result.hits.length;i++){
     const hit=result.hits[i];damage+=hit.damage;
+    const rolls=[[`${result.attackerName} 공격`,attacker.attack,hit.attack]];
+    if(i===0)rolls.push([`${result.defenderName} 방어`,defender.defense,result.defense]);
+    if(!await showRolls(rolls,token))return;
+    if(i>0)$('#dice-tray').append(el('span','shield-carry',`방어 재굴림 없음 · 남은 방어 ${hit.shieldBefore}`));
     $('#attack-value').textContent=hit.attack.total;$('#defense-value').textContent=`${hit.shieldBefore} → ${hit.shieldAfter}`;
     $('#damage-value').textContent=damage;$('#hit-value').textContent=`${i+1} / ${result.hits.length}`;
     $('#phase-label').textContent=result.combo?`연속공격 · ${i+1}타`:'공격 완료';
