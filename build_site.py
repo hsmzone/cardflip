@@ -8,8 +8,12 @@ from server import ROOT, characters
 def build(output=None):
     target = Path(output) if output else ROOT / '_site'
     target.mkdir(parents=True, exist_ok=True)
-    for name in ['index.html', 'style.css', 'game.js', 'card_back.png', 'name.png', 'mask.png']:
+    for name in ['index.html', 'memory.html', 'battle.html', 'battle.css', 'battle.js',
+                 'battle-engine.js', 'battle-data.js', 'battle-audio.js',
+                 'style.css', 'game.js', 'card_back.png', 'name.png', 'mask.png']:
         shutil.copy2(ROOT / name, target / name)
+    for image in ROOT.glob('battle-monster-*.png'):
+        shutil.copy2(image, target / image.name)
     entries = characters()
     (target / 'cha').mkdir(exist_ok=True)
     for entry in entries:

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>던전의 짝꿍 · 카드 짝 맞추기</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="characters.js" defer></script>
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <main id="setup" class="setup">
+    <nav class="memory-mode-nav"><a href="index.html">← 게임 선택</a><a href="battle.html">카드 배틀 ↗</a></nav>
+    <header>
+      <p class="eyebrow">DELICIOUS DUNGEON · MEMORY GAME</p>
+      <h1>던전의 짝꿍</h1>
+      <p class="intro">카드를 뒤집어, 같은 모험가를 찾아주세요.</p>
+    </header>
+    <form id="settings" class="settings">
+      <label>카드 쌍 수 <select id="difficulty"><option value="6">6쌍 · 12장</option><option value="12">12쌍 · 24장</option><option value="18">18쌍 · 36장</option><option value="24">24쌍 · 48장</option></select></label>
+      <p id="library-status" class="setup-note" role="status"></p>
+      <label id="folder-control" hidden>캐릭터 폴더 새로 읽기 <input id="character-folder" type="file" webkitdirectory multiple accept="image/*"></label>
+      <label>다른 카드 확인 시간 <select id="flip-delay"><option value="1600">여유롭게 · 1.6초</option><option value="1050" selected>보통 · 1초</option><option value="600">빠르게 · 0.6초</option></select></label>
+      <label>효과음 <input id="sound-enabled" type="checkbox" checked aria-label="효과음 켜기"></label>
+      <p class="rules">두 장씩 뒤집어 같은 캐릭터를 찾아주세요.<br>짝을 찾으면 열린 채로 남고, 다르면 다시 뒤집힙니다.</p>
+      <button id="start" class="primary" type="submit">게임 시작</button>
+      <p class="setup-note">게임 중에는 카드만 표시됩니다.<br>PC는 Esc, 휴대폰은 뒤로가기로 준비 화면에 돌아옵니다.</p>
+    </form>
+  </main>
+  <section id="play" class="play" hidden aria-label="게임 화면">
+    <p id="message" class="sr-only" role="status" aria-live="polite"></p>
+    <section id="board" class="board" aria-label="짝 맞추기 카드"></section>
+  </section>
+  <dialog id="result" aria-labelledby="result-title">
+    <p class="eyebrow">ADVENTURE COMPLETE</p>
+    <h2 id="result-title">모든 짝을 찾았어요!</h2>
+    <div class="stats"><span>찾은 짝 <strong id="pairs">0 / 6</strong></span><span>시도 <strong id="moves">0</strong></span><span>시간 <strong id="time">00:00</strong></span></div>
+    <button id="restart" class="primary" type="button">준비 화면으로</button>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>던전의 승부 · 카드 배틀</title>
+  <link rel="stylesheet" href="battle.css">
+  <script src="battle-data.js" defer></script><script src="battle-engine.js" defer></script>
+  <script src="battle-audio.js" defer></script><script src="battle.js" defer></script>
+</head>
+<body class="battle-body">
+  <section id="party-setup" class="party-setup">
+    <nav class="site-nav"><a href="index.html">← 게임 선택</a><a href="memory.html">카드 뒤집기 ↗</a></nav>
+    <header class="page-heading"><p class="overline">DELICIOUS IN DUNGEON · CARD BATTLE</p><h1>던전의 승부</h1><p>모험가 네 명, 세 번의 전투. 주사위가 운명을 결정합니다.</p></header>
+    <section class="party-config" aria-label="파티 편성">
+      <div><p class="overline">YOUR ADVENTURERS</p><h2>함께할 파티를 골라주세요 <span id="selected-count">4 / 4</span></h2><p class="muted">공격·방어는 원본 캐릭터 데이터입니다. D4는 4면체, D6는 6면체 주사위입니다.</p></div>
+      <div class="config-actions"><button id="default-party">라이오스 파티</button><button id="random-party">무작위 편성 ↻</button><label><input type="checkbox" id="battle-sound" checked> 효과음</label></div>
+    </section>
+    <div class="party-filter"><label>파티 <select id="party-filter"><option value="all">모든 모험가</option></select></label><span id="roster-count"></span></div>
+    <div id="roster" class="roster" aria-label="캐릭터 선택"></div>
+    <section class="launch-panel"><div><strong>모험가 4인 · 던전 3연전</strong><p>매 턴 전술 카드를 골라 공격·방어를 굴립니다. 양측이 동시에 피해를 받습니다.</p><details><summary>전투 규칙 보기</summary><p>아군 체력 80, 적 체력 18 / 20 / 24. 피해는 공격 합계 − 상대 방어 합계이며 최소 1입니다. 승리하면 체력을 12 회복합니다. 마지막 전투까지 이기면 클리어! 체력·전술 보너스는 이 웹게임의 공통 규칙이며 원본 캐릭터 능력치와 별개입니다.</p></details></div><button id="begin-battle" class="gold-button">던전에 입장하기 <span>→</span></button></section>
+    <p id="setup-feedback" role="status" class="feedback"></p>
+  </section>
+  <main id="arena" class="arena" hidden>
+    <header class="arena-header"><button id="back-to-party">← 파티 편성</button><div><span class="overline">DUNGEON ENCOUNTER</span><h1 id="encounter-title"></h1></div><label class="auto-label"><input type="checkbox" id="auto-battle"> 자동 진행</label></header>
+    <div class="encounter-track" aria-label="던전 진행"><span data-stage="0">01 버섯의 숲</span><i></i><span data-stage="1">02 납골당</span><i></i><span data-stage="2">03 갑옷의 방</span></div>
+    <section class="battlefield" aria-label="전투 필드">
+      <div class="team ally-team"><div class="team-heading"><div><span class="overline">YOUR PARTY</span><h2>모험가 파티</h2></div><span class="hp-value" id="ally-hp-label"></span></div><div class="hp-track"><div id="ally-hp-bar"></div></div><div id="ally-lineup" class="lineup"></div></div>
+      <div class="versus"><span id="round-label">ROUND 01</span><b>VS</b><span class="crossed-swords">⚔</span></div>
+      <div class="team enemy-team"><div class="team-heading"><div><span class="overline">ENEMY PARTY</span><h2 id="enemy-name"></h2></div><span class="hp-value" id="enemy-hp-label"></span></div><div class="hp-track enemy"><div id="enemy-hp-bar"></div></div><div id="enemy-lineup" class="lineup"></div></div>
+    </section>
+    <section class="resolution" aria-label="주사위 판정 결과"><div class="power ally-power"><div><span>⚔ 공격 합계</span><strong id="ally-attack">—</strong></div><div><span>◇ 방어 합계</span><strong id="ally-defense">—</strong></div></div><div class="round-status"><span id="phase-label">전술을 선택하세요</span><p id="round-message" role="status" aria-live="polite">전술 카드를 고르면 주사위가 굴러갑니다.</p></div><div class="power enemy-power"><div><span>⚔ 공격 합계</span><strong id="enemy-attack">—</strong></div><div><span>◇ 방어 합계</span><strong id="enemy-defense">—</strong></div></div></section>
+    <section class="command-area" aria-label="전술 카드"><div class="command-title"><span class="overline">CHOOSE YOUR TACTIC</span><p>이번 턴의 전술</p></div><div id="tactics" class="tactics"></div><div class="deck-mark"><span>✦</span><strong>매 턴 1장 선택</strong><small>전술 보너스는 파티 합계에 적용</small></div></section>
+    <details class="combat-log"><summary>전투 기록 <span id="log-last">아직 전투가 시작되지 않았습니다.</span></summary><ol id="log-list"></ol></details>
+  </main>
+  <dialog id="battle-result" aria-labelledby="battle-result-title"><p class="overline" id="result-kicker"></p><h2 id="battle-result-title"></h2><p id="battle-result-description"></p><button id="continue-battle" class="gold-button"></button><button id="result-party" class="text-button">파티 다시 편성하기</button></dialog>
+</body>
+</html>

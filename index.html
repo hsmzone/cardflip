@@ -1,40 +1,8 @@
 <!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>던전의 짝꿍 · 카드 짝 맞추기</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="characters.js" defer></script>
-  <script src="game.js" defer></script>
-</head>
-<body>
-  <main id="setup" class="setup">
-    <header>
-      <p class="eyebrow">DELICIOUS DUNGEON · MEMORY GAME</p>
-      <h1>던전의 짝꿍</h1>
-      <p class="intro">카드를 뒤집어, 같은 모험가를 찾아주세요.</p>
-    </header>
-    <form id="settings" class="settings">
-      <label>카드 쌍 수 <select id="difficulty"><option value="6">6쌍 · 12장</option><option value="12">12쌍 · 24장</option><option value="18">18쌍 · 36장</option><option value="24">24쌍 · 48장</option></select></label>
-      <p id="library-status" class="setup-note" role="status"></p>
-      <label id="folder-control" hidden>캐릭터 폴더 새로 읽기 <input id="character-folder" type="file" webkitdirectory multiple accept="image/*"></label>
-      <label>다른 카드 확인 시간 <select id="flip-delay"><option value="1600">여유롭게 · 1.6초</option><option value="1050" selected>보통 · 1초</option><option value="600">빠르게 · 0.6초</option></select></label>
-      <label>효과음 <input id="sound-enabled" type="checkbox" checked aria-label="효과음 켜기"></label>
-      <p class="rules">두 장씩 뒤집어 같은 캐릭터를 찾아주세요.<br>짝을 찾으면 열린 채로 남고, 다르면 다시 뒤집힙니다.</p>
-      <button id="start" class="primary" type="submit">게임 시작</button>
-      <p class="setup-note">게임 중에는 카드만 표시됩니다.<br>PC는 Esc, 휴대폰은 뒤로가기로 준비 화면에 돌아옵니다.</p>
-    </form>
-  </main>
-  <section id="play" class="play" hidden aria-label="게임 화면">
-    <p id="message" class="sr-only" role="status" aria-live="polite"></p>
-    <section id="board" class="board" aria-label="짝 맞추기 카드"></section>
-  </section>
-  <dialog id="result" aria-labelledby="result-title">
-    <p class="eyebrow">ADVENTURE COMPLETE</p>
-    <h2 id="result-title">모든 짝을 찾았어요!</h2>
-    <div class="stats"><span>찾은 짝 <strong id="pairs">0 / 6</strong></span><span>시도 <strong id="moves">0</strong></span><span>시간 <strong id="time">00:00</strong></span></div>
-    <button id="restart" class="primary" type="button">준비 화면으로</button>
-  </dialog>
-</body>
-</html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>던전의 놀이방 · 카드 게임</title><link rel="stylesheet" href="battle.css"></head>
+<body class="portal-body"><main class="portal">
+<header class="portal-heading"><p class="overline">DELICIOUS IN DUNGEON · CARD GAMES</p><span class="portal-emblem" aria-hidden="true">✦</span><h1>던전의 놀이방</h1><p>같은 얼굴을 찾아도, 함께 싸워도.<br>모험가들과 즐기는 두 가지 카드 게임.</p></header>
+<div class="mode-grid">
+<a href="memory.html" class="mode-card memory-mode"><div class="mode-visual"><div class="mini-back"></div><div class="mini-card"><img src="cha/마르실.png" alt="마르실"></div><div class="mini-card second"><img src="cha/마르실.png" alt=""></div></div><div class="mode-copy"><span class="overline">01 · MEMORY GAME</span><h2>카드 뒤집기</h2><p>카드 속 모험가를 기억하고<br>꼭 맞는 짝을 찾아주세요.</p><span class="mode-tags">6 / 12 / 18 / 24쌍 · 기억력 게임</span><strong>짝 찾으러 가기 <span>→</span></strong></div></a>
+<a href="battle.html" class="mode-card battle-mode"><div class="mode-visual battle-visual"><img class="portal-hero" src="cha/라이오스.png" alt="라이오스"><span class="portal-vs">VS</span><img class="portal-monster" src="battle-monster-걷는버섯.png" alt="걷는버섯"></div><div class="mode-copy"><span class="overline">02 · DICE CARD BATTLE</span><h2>카드 배틀</h2><p>네 명의 모험가, 한 장의 전술.<br>주사위로 던전의 승부를 펼쳐보세요.</p><span class="mode-tags">4인 파티 · 공격과 방어 · 던전 3연전</span><strong>파티 편성하러 가기 <span>→</span></strong></div></a>
+</div><footer class="portal-footer">당신의 다음 모험을 선택하세요.</footer></main></body></html>

@@ -44,6 +44,8 @@ footer { margin-top: 12px; text-align: center; font-size: 11px; color: #879f90; 
 .primary:disabled { opacity: .5; cursor: wait; }
 .primary:focus-visible { outline: 3px solid #fff0c5; outline-offset: 4px; }
 .setup-note { color: #8da495; font-size: 11px; text-align: center; line-height: 1.8; margin: 17px 0 0; }
+.memory-mode-nav { display: flex; justify-content: space-between; margin-bottom: 22px; font-size: 12px; }
+.memory-mode-nav a { color: #cda67f; text-decoration: none; }
 .play { height: 100dvh; width: 100%; padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); display: flex; }
 .is-playing { overflow: hidden; }
 .sr-only { position: absolute; width: 1px; height: 1px !important; padding: 0; margin: -1px !important; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
